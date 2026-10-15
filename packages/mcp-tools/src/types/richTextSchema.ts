@@ -69,7 +69,14 @@ const embeddedAssetBlockNodeSchema = z.object({
 const hyperlinkInlineNodeSchema = z.object({
   nodeType: z.literal(INLINES.HYPERLINK),
   data: z.object({
-    uri: z.string().url(),
+    uri: z.union([
+      z.string().url(),
+      z.string().regex(
+        // eslint-disable-next-line no-control-regex -- Reject control characters in URLs.
+        /^\/(?!\/)[^\s\\\u0000-\u001f\u007f]*$/,
+        'Expected an absolute URL or a root-relative URL',
+      ),
+    ]),
   }),
   content: z.array(richTextTextNodeSchema),
 });
